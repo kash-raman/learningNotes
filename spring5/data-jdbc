@@ -1,0 +1,61 @@
+Data 
+
+JdbcTemplate - abstraction for connection and closing one. Needs dataSource
+DataSource - driverClassName, url ,username, password
+
+DataSourceInitizer  — init of DataSource
+DataSourcePopulator - populates data
+
+EmmbeddedDatabaseBuilder === <jdbc:embedded-database />
+SimpleDataSourceDriver 
+
+RowMapper - one ResultSet to POJO , one primitive  result does not need RowMapper.
+ RowCallbackHandler for no result need to be returned 
+ResultSetExtractor for all resultSet 
+
+query - List
+ queryForObject - single result
+queryForMap - returns col name, column value
+
+
+
+
+DataAccessException - mother of all data exception. Its a child of runtime. Used to avoid duplicate code- catch n rethrow. 
+
+NonTransient - Root cause needs to be fixed 
+Recoverable - can succeed if retried 
+Transient - may success if retired. network related. 
+script
+
+Transaction 
+
+ACID - Atomicity, Consistency, isolation , and Durability 
+
+Propagation - Required, required_new, nested, never, mandatory , not_supported, supports
+
+Isolation - DEFAULT, read uncommitted, read committed, repeated read, serializable. 
+- phantom read - until serializable. 
+- dirty read - read uncommitted 
+- 
+
+Local JDBC  - DatabaseTransactionManager  + Datasource
+Local Hibernate  - HibernateTransactionManager + LocalSessionFactoryBean 
+Local JPA - JpaTransactionManager + LocalContainerEntityManagerFactoryBEan 
+JTA - multiple DB updates etc. - JtaTransactionManager
+
+TansactionInterceptor -invoked by proxy 
+TransactionTemplate 
+TransactionStatus - setrollbackonly
+TransactionCallback interface 
+PlatformTransctionmanger interface  - commit, rollback , getTransaction
+
+
+@Transactional 
+
+Only on public methods 
+method in same class won’t work as targets
+Only unchecked exceptions 
+Cannot change transaction name by declarative, will use method name 
+if XML - needs a transactionManager bean 
+if @EnableTransactionManagement - will pick up PlatformTransctionmanger impl 
+	When multiple > 

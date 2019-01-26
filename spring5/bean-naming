@@ -1,0 +1,208 @@
+Beans
+
+Jars: core, context, bean 
+Optional : context-support(for 3rd party frameworks) , expression (SpEl)
+
+bean definitions in XML, java or annotation.
+infra beans: @configuration, @bean
+
+Bean Naming: 
+
+id - unique 
+name - multiple 
+name attribute can have multiple values separated by , ; or space.  
+if id not present name will be picked up based on delimiter 
+id and name can be same value
+<bean name=“abc; dd, ddr ddasdf/> then id=abc names =4 
+<bean id=“abc; dd, ddr ddasdf/> then id =abc; dd, ddr ddasdf name 0
+@Bean - name= method name . can be array
+Bean id in xml - beanId#random0-9
+@Repository - name = class name with lower case first letter. Cannot be array. 
+
+
+Exceptions: 
+Cyclic dependency : BeanInCreationException 
+No bean found - NoSuchBeanFoundException
+multipleBean found - NoUniqueBeanDefinitionException 
+if bean id used in other bean name - BeanDefinitionParsingException
+
+
+Constructor injection: Immutable, final fields assignment, instantiation + initialization combined together, 
+value, ref , index, type 
+
+c namespace 
+c:nameConstructParam-ref 
+c:_ConstructIndex-ref 
+
+If NO constructor - default constructor will be used (compiler creates one)
+
+Setter Injection: 
+p namespace 
+Initialization split into 2 - setter dependency + init method 
+property - NO type  available, Name mandatory
+TODO: meta, qualifier 
+
+use qualifier with attribute or meta. https://docs.spring.io/spring-framework/docs/4.3.9.RELEASE/spring-framework-reference/html/beans.html#beans-autowired-annotation-qualifiers 
+<bean class="example.SimpleMovieCatalog">
+        <qualifier type="MovieQualifier">
+            <attribute key="format" value="VHS"/>
+            <attribute key="genre" value="Comedy"/>
+        </qualifier>
+        <!-- inject any dependencies required by this bean -->
+    </bean>
+
+    <bean class="example.SimpleMovieCatalog">
+        <meta key="format" value="DVD"/>
+        <meta key="genre" value="Action"/>
+        <!-- inject any dependencies required by this bean -->
+    </bean>
+
+
+Scalar injection: 
+Scalar means magnitude - constants - mainly primitive and string. 
+Uses PropertyEditor to convert one to another. Custom converter/formatter can be defined. 
+
+${}
+@value - int, boolean, string - 
+
+BeanFactoryPostProcessor for scalar. 
+<context:property-placeholder location=“*.properties/>
+PropertyPlaceHolderConfigurer - location  accessed via ${}  - No env support. 
+
+
+
+SpEL#{}
+Uses:
+method invocation 
+properties and indexed collections
+filter collection 
+relational operation 
+ PropertySourcePlaceHolderConfigurer - location  accessed via ${} and #{}  - env support available. 
+
+
+Non-Bean injection -Used for 3rd party lib specially.
+ 
+Inject static and non-static method 
+	static method - use only factory-method (singleton defined in java) 
+	non static - use factory-bean and factory-method (3rd party object) 
+non- spring class
+	use FactoryBean<T> override getObject to return object.  (JPA)
+
+static and non static field member 
+	util:constant for static-filed constant injection via XML 
+	FieldRetrievingFactoryBean  for static and non-static field. 
+
+Collection Injection
+util namespace can be used. 
+
+map, set, list and properties(prop)
+
+set and list can be created on spot.
+map - no spot creation , no null, 
+keys/values of non-primitive type (-ref) can be used to refer an existing bean.  <entry key =“one” value-ref=“bean-name”/>
+
+works like singleton.  
+
+Abstract class / inheritance/ inner class. 
+
+abstract= true 
+parent = “parent-bean-name” 
+inner class - no bean name/id  need, it would be like field injection. 
+$ can be used to identify inner class. abc$person
+
+Application Context:
+Usage: 
+1. access the  bean using BeanFactory  methods 
+2. Reads properties and set them in container 
+3. MessageSource - resolves messages and internationalization 
+4. Publish event to Listener 
+Can be defined in XML or configuration class. 
+No Autowire for scalar. primitive value. 
+5 types - ClasspathAC, FileXMLAC, AnnotationCAC, AnnotationWAC, 
+ Loads files using ResourceLoader.
+Loads bean using BeanFactory 
+Resolve message using MessageSource
+
+<Import resource=“”/>
+@Import
+@Resource - JDK 
+
+Bean Life Cycle:
+
+1. XML is parsed by Application Context using DefaultListenableBEanFactory 
+2. BeanFactoryPostProcessor implementations are loaded to get properties 		
+3. Beans are initialized using Constructor injection 
+4. Dependency are injected via setter injection 
+5. BeanPostProcessor implementations before initialization are called (callbacks)
+6. Bean initialized. 
+7. BeanPostProcessor implementations after initialization are called (callbacks)
+8. Destroy 
+
+
+Step 2: Example: PropertyPlaceholderConfigurer has one method implemented from interface postProcessBeanFactory . 
+
+Step 5:  BeanPostProcessor -postProcessBeforeInitialization
+ - before methods  in order- @PostConstruct, InitializationBean - afterSetProperties , init-method. 
+Works based on reflection, should be void, no arg, any access- private preferred. 
+if @postConstruct and init-method uses same method will be called once. 
+
+Need <context:annotation-config/> or CommonAnnotationBEanPostPorcessor wired for @postConstruct) 
+
+Step 7: Wraps bean with proxies will normally implement. 
+
+
+Step 8: Destroy methods  in order- @PreDestroy, DisposalBEan - destroy , destory-method. 
+
+Note: 
+@postConstruct and @PreDestroy are java annotations. 
+Refrain from InitializationBean and DisposalBEan - unnecessary coupling. 
+AC.close or registerShutdownHook can be called to close context and destroy beans. 
+
+Scope:
+
+Singelton default. 
+When a prototype bean requires a singleton, it will be injected only once. If you need new bean every time for prototype, need to implement ACAware and inject new bean.   
+You can also use <aop:scoped-proxy/> to define the scope of the object. 
+prototype is lazy init. 
+if a bean is marked as lazy and required by non-lazy bean, it will be initialized eager. 
+
+Annotations:
+
+class level 
+@Component - meta annotation used by controller, service, repository and configuration.  Except Configuration all 3 are sterotype annotation. 
+@PropertySource requires PropertySourcePlaceHolderConfigurer bean - for properties
+@importResource for bean xml 
+@Import for java config
+—————————————
+@Autowired - method, constructor and field . done BY Type
+required attribute defaulted to true.  multiple constructor in a bean, one should have required true and others as false 
+scalar values cannot be auto wired rather @Value should be used. 
+[] can be auto wired 
+strongly-typed Maps can be auto wired if the expected key type is String
+
+@Lazy works with auto wire for lazy init. 
+
+@Required - method 
+@AlliasFor - short name for attribute in @. 
+
+
+@Bean vs @Component 
+
+@bean is used with @Configuration . Does use CGLIB , they are proxy 
+@Component is autodetected in component-scan . Does not use CGLIB , thy are java class 
+
+@Bean with static method 
+Allows to be called without creating an instance of the configuration 
+Will not be intercepted by proxy when you call the method 
+Early initialization 
+should not be final or private 
+
+@Profile 
+allows !  -> {“dev”,”!qa”}
+can be marked for @bean ,@configuration or bean xml in the <beans profile tag> can be one or more file. 
+can be activated using 
+ctx.getEnvironment().setActiveProfiles("profile1", "profile2");
+-Dspring.profiles.active="profile1,profile2"
+@ActiveProfiles
+
+

@@ -1,0 +1,70 @@
+MVC
+
+Model View Controller
+Default view resolver - InternalResourceViewResolver 
+Defaut- Upon initialization of a DispatcherServlet, Spring MVC looks for a file named [servlet-name]-servlet.xml 
+
+Controller - extends Abstract Controller 
+can return null, can be void method 
+Controllers implemented in this style do not have to extend specific base classes or implement specific interfaces.
+they do not usually have direct dependencies on Servlet or Portlet APIs, although you can easily configure access to Servlet or Portlet facilities.
+
+WebInitializer - SpringWebInitializer
+RequestContextUtil
+Java AbstractAnnotationConfigDispatcherServletInitializer or WebConfiguraterAdaptor or WebConfigurater
+contextClass - AnnotationConfigWebApplicationContext
+
+WebApplicationInitializer
+
+@PathVariable 
+A @PathVariable argument can be of any simple type such as int, long, Date, etc. Spring automatically converts to the appropriate type or throws aTypeMismatchException if it fails to do so
+
+
+A pattern with a lower count of URI variables and wild cards is considered more specific. For example /hotels/{hotel}/* has 1 URI variable and 1 wild card and is considered more specific than /hotels/{hotel}/** which as 1 URI variable and 2 wild cards.
+If two patterns have the same count, the one that is longer is considered more specific. For example /foo/bar* is longer and considered more specific than /foo/*.
+When two patterns have the same count and length, the pattern with fewer wild cards is considered more specific. For example /hotels/{hotel} is more specific than /hotels/*.
+
+@RequestParam
+Parameters using this annotation are required by default @RequestParam(name="id", required=false)
+ is used on a Map<String, String> or MultiValueMap<String, String> argument,
+
+
+An HTTP HEAD request is processed as if it were an HTTP GET except instead of writing the body only the number of bytes are counted and the "Content-Length" header set.
+ By default an HTTP OPTIONS request is handled by setting the "Allow" response header to the HTTP methods explicitly declared on all @RequestMapping methods with matching URL patterns
+Non-browser clients can also submit forms via HTTP PUT
+
+@RequestBody
+HttpMessageConverter is responsible for converting from the HTTP request message to an object and converting from an object to the HTTP response body. 
+
+Every @RequestMapping is assigned a default name based on the capital letters of the class and the full method name. For example, the method getFoo in class FooController is assigned the name "FC#getFoo".
+
+
+REST - Representional State Transfer 
+deals with resources - supports GET, PUT,POST, DELETE , PATCH, HEAD, OPTIONS
+
+PUT vs POST - PUT for browser less application in @Controller. PUT for update in @RestController 
+DELETE response type 
+HEAD - same as GET, uses header instead of body.
+
+
+Security 
+
+springSecurityFilterChain
+
+@Secured - 
+jsr 250 - @RolesAllowed 
+@Pre,@Post Filter 
+@Pre,@Post Authorize 
+
+AuthenticationManager -> AuthenticationProvider -> UserServiceDetail 
+getPrincipal - UserServiceDetails
+
+AccessDecisionManager 
+	<password-encoder ref="bcryptEncoder"/>
+
+A hash (or digest) algorithm is a one-way function which produces a piece of fixed-length output data (the hash) from some input data, such as a password 
+ 
+
+     <intercept-url pattern="/**" access="ROLE_USER" filters="none" />
+
+    "'filters' can only take the value "none".  This will cause any matching request to bypass the Spring Security filter chain entirely.  None of the rest of the <http> configuration will have any effect on the request and there will be no security context available for its duration. Access to secured methods during the request will fail."

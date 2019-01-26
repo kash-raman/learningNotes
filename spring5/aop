@@ -1,0 +1,51 @@
+AOP
+Solves cross cutting problem - security, logging and transaction concern. 
+IF AOP is not used, you will end up with Code scattering  & Code tangling 
+Spring AOP uses Java implementation. which means runtimes weaving and  there is no dependency on the AspectJ compiler or weaver
+Aspect cannot advice on private or final method.  field variable and Method calling method inside class cannot be controlled. 
+aspects themselves cannot be the targets of advice from other aspects. The @Aspect annotation on a class marks it as an aspect and, hence, excludes it from auto-proxying.
+If the target implements interface, dynamic JDK proxy will be used. otherwise CGLIB. Can be forced by using proxyTargetClass=true
+
+To start, you need to use @EnableAspectJAutoProxy  or <aop:aspectj-autoproxy/>  
+
+Theory:
+AspectJ:
+AspectJ jars - aspect-weaving and aspectjrt when AspectJ used 
+If constructor or method calling  methods within classes needs to be handled
+If field level control 
+
+Advice types:
+Before -
+AfterThrowing -  You can use the throwing attribute to both restrict matching (if desired — use Throwable as the exception type otherwise) and bind the thrown exception to an advice parameter. 
+AfterReturning - 
+After - (Finally like) - 
+Around - Little different has proceedingJoinPoint as arg. pjp.proceed() to call target 
+
+Join point 
+Pointcut  - condition at which join point executes 
+Aspect -
+target  - action on a class 
+advice - kind 
+weaving 
+ 
+Implemntation 
+ <aop:aspectj-autoproxy>
+     <aop:include name="beanXMLConfig"></aop:include>
+ </aop:aspectj-autoproxy>
+
+ <aop:config>
+     <aop:aspect ref="beanXMLConfig">
+         <aop:before pointcut="execution( * update(Long,*)) " method="printMe" />
+
+     </aop:aspect>
+ </aop:config>
+
+ 
+execution( * *(..)) - return and parameter are mandatory. Exception IllegalArgumentException if    missing. 
+parameter .. -> 0- n ; * -> 1 ; () -> 0 
+
+named point cut - multiple point cut as separated method. 
+TODO 
+QUESTION :<aop:aspectj-autoproxy/> vs  @EnableAspectJAutoProxy  
+
+ 
